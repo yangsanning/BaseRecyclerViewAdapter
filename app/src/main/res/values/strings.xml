@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">TreeRecyclerViewAdapter</string>
+    <string name="main_activity_sticky_list">吸顶列表</string>
+    <string name="main_activity_expandable_list">收起展开列表</string>
+</resources>
