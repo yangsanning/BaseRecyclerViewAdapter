@@ -5,12 +5,12 @@ import ysn.com.recyclerview.holder.BaseViewHolder;
 
 /**
  * @Author yangsanning
- * @ClassName OnChildrenClickListener
+ * @ClassName OnItemClickListener
  * @Description 子项点击事件
  * @Date 2020/4/4
  * @History 2020/4/4 author: description:
  */
-public interface OnChildrenClickListener {
+public interface OnItemClickListener {
 
     /**
      * 子项点击事件
@@ -19,5 +19,5 @@ public interface OnChildrenClickListener {
      * @param holder        {@link BaseViewHolder}
      * @param groupPosition 组坐标
      */
-    void onChildrenClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition, int childPosition);
+    void onItemClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition, int childPosition);
 }

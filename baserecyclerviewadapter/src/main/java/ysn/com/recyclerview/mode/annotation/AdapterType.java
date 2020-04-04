@@ -12,22 +12,22 @@ import java.lang.annotation.RetentionPolicy;
  * @Date 2019/6/18
  * @History 2019/6/18 author: description:
  */
-@IntDef({AdapterType.HEADER, AdapterType.CHILDREN, AdapterType.FOOTER})
+@IntDef({AdapterType.HEADER, AdapterType.ITEM, AdapterType.FOOTER})
 @Retention(RetentionPolicy.SOURCE)
 public @interface AdapterType {
 
     /**
-     * 头部
+     * 头布局
      */
     int HEADER = 1;
 
     /**
-     * 内容
+     * 子项
      */
-    int CHILDREN = 2;
+    int ITEM = 2;
 
     /**
-     * 尾部
+     * 脚布局
      */
     int FOOTER = 3;
 }

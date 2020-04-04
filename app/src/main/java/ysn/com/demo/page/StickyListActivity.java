@@ -41,7 +41,7 @@ public class StickyListActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onChildrenClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition, int childPosition) {
+            public void onItemClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition, int childPosition) {
                 showMsg(groupedListAdapter.getDatas().get(groupPosition).getChildrenList().get(childPosition).getChild());
             }
 

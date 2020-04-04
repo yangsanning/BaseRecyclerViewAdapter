@@ -12,7 +12,7 @@ import ysn.com.demo.adapter.ExpandableAdapter;
 import ysn.com.demo.utils.DataUtils;
 import ysn.com.recyclerview.adapter.BaseRecyclerViewAdapter;
 import ysn.com.recyclerview.holder.BaseViewHolder;
-import ysn.com.recyclerview.listener.OnChildrenClickListener;
+import ysn.com.recyclerview.listener.OnItemClickListener;
 import ysn.com.recyclerview.listener.OnFooterClickListener;
 import ysn.com.recyclerview.listener.OnHeaderClickListener;
 
@@ -50,10 +50,10 @@ public class ExpandableListActivity extends AppCompatActivity {
             }
         });
 
-        expandableAdapter.setOnChildrenClickListener(new OnChildrenClickListener() {
+        expandableAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onChildrenClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder,
-                                        int groupPosition, int childPosition) {
+            public void onItemClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder,
+                                    int groupPosition, int childPosition) {
                 Toast.makeText(ExpandableListActivity.this,
                         expandableAdapter.getDatas().get(groupPosition).getChildrenList().get(childPosition).getChild(),
                         Toast.LENGTH_SHORT).show();

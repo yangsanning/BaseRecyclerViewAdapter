@@ -11,12 +11,12 @@ public class Group {
 
     private boolean hasHeader;
     private boolean hasFooter;
-    private int childrenCount;
+    private int itemCount;
 
-    public Group(boolean hasHeader, boolean hasFooter, int childrenCount) {
+    public Group(boolean hasHeader, boolean hasFooter, int itemCount) {
         this.hasHeader = hasHeader;
         this.hasFooter = hasFooter;
-        this.childrenCount = childrenCount;
+        this.itemCount = itemCount;
     }
 
     public boolean hasHeader() {
@@ -35,16 +35,16 @@ public class Group {
         this.hasFooter = hasFooter;
     }
 
-    public int getChildrenCount() {
-        return childrenCount;
-    }
-
-    public void setChildrenCount(int childrenCount) {
-        this.childrenCount = childrenCount;
-    }
-
     public int getItemCount() {
-        int itemCount = childrenCount;
+        return itemCount;
+    }
+
+    public void setItemCount(int itemCount) {
+        this.itemCount = itemCount;
+    }
+
+    public int getRealItemCount() {
+        int itemCount = this.itemCount;
         if (hasHeader()) {
             itemCount += 1;
         }

@@ -39,7 +39,7 @@ public class ExpandableAdapter extends BaseRecyclerViewAdapter<ExpandableGroupBe
     }
 
     @Override
-    public int getChildrenCount(int groupPosition) {
+    public int getItemCount(int groupPosition) {
         //如果当前组为展开时，返回子项数，否则返回0
         if (isExpand(groupPosition)) {
             ArrayList<ChildrenBean> childrenList = expandableGroupList.get(groupPosition).getChildrenList();
@@ -70,7 +70,7 @@ public class ExpandableAdapter extends BaseRecyclerViewAdapter<ExpandableGroupBe
     }
 
     @Override
-    public int getChildrenLayout(int viewType) {
+    public int getItemLayout(int viewType) {
         return R.layout.item_adapter_children;
     }
 
@@ -88,9 +88,9 @@ public class ExpandableAdapter extends BaseRecyclerViewAdapter<ExpandableGroupBe
     }
 
     @Override
-    public void onBindChildrenViewHolder(BaseViewHolder holder, int groupPosition, int childPosition) {
+    public void onBindItemViewHolder(BaseViewHolder holder, int groupPosition, int groupItemPosition) {
         holder.setText(R.id.adapter_item_children_text,
-                expandableGroupList.get(groupPosition).getChildrenList().get(childPosition).getChild());
+                expandableGroupList.get(groupPosition).getChildrenList().get(groupItemPosition).getChild());
     }
 
     /**
@@ -134,7 +134,7 @@ public class ExpandableAdapter extends BaseRecyclerViewAdapter<ExpandableGroupBe
         ExpandableGroupBean expandableGroup = expandableGroupList.get(groupPosition);
         expandableGroup.setExpand(false);
         if (animate) {
-            notifyChildrenRemoved(groupPosition);
+            notifyItemRemove(groupPosition);
         } else {
             notifyDataChanged();
         }

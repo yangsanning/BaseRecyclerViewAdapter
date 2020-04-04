@@ -39,7 +39,7 @@ public class GroupedListAdapter extends BaseRecyclerViewAdapter<GroupBean> {
     }
 
     @Override
-    public int getChildrenCount(int groupPosition) {
+    public int getItemCount(int groupPosition) {
         ArrayList<ChildrenBean> children = datas.get(groupPosition).getChildrenList();
         return children == null ? 0 : children.size();
     }
@@ -65,7 +65,7 @@ public class GroupedListAdapter extends BaseRecyclerViewAdapter<GroupBean> {
     }
 
     @Override
-    public int getChildrenLayout(int viewType) {
+    public int getItemLayout(int viewType) {
         return R.layout.item_adapter_children;
     }
 
@@ -82,8 +82,8 @@ public class GroupedListAdapter extends BaseRecyclerViewAdapter<GroupBean> {
     }
 
     @Override
-    public void onBindChildrenViewHolder(BaseViewHolder holder, int groupPosition, int childPosition) {
+    public void onBindItemViewHolder(BaseViewHolder holder, int groupPosition, int groupItemPosition) {
         holder.setText(R.id.adapter_item_children_text,
-                datas.get(groupPosition).getChildrenList().get(childPosition).getChild());
+                datas.get(groupPosition).getChildrenList().get(groupItemPosition).getChild());
     }
 }

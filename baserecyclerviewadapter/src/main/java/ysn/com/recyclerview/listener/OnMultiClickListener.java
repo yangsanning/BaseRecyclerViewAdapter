@@ -28,7 +28,7 @@ public interface OnMultiClickListener {
      * @param holder        {@link BaseViewHolder}
      * @param groupPosition 组坐标
      */
-    void onChildrenClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition, int childPosition);
+    void onItemClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition, int childPosition);
 
     /**
      * 脚布局点击事件

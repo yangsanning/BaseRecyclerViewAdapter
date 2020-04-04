@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ysn.com.recyclerview.holder.BaseViewHolder;
-import ysn.com.recyclerview.listener.OnChildrenClickListener;
 import ysn.com.recyclerview.listener.OnFooterClickListener;
 import ysn.com.recyclerview.listener.OnHeaderClickListener;
+import ysn.com.recyclerview.listener.OnItemClickListener;
 import ysn.com.recyclerview.listener.OnMultiClickListener;
 import ysn.com.recyclerview.mode.annotation.AdapterType;
 import ysn.com.recyclerview.mode.bean.Group;
@@ -45,7 +45,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
 
     private OnMultiClickListener onMultiClickListener;
     private OnHeaderClickListener onHeaderClickListener;
-    private OnChildrenClickListener onChildrenClickListener;
+    private OnItemClickListener onItemClickListener;
     private OnFooterClickListener onFooterClickListener;
 
     public BaseRecyclerViewAdapter(Context context) {
@@ -124,24 +124,24 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
                 }
                 onBindHeaderViewHolder((BaseViewHolder) holder, groupPosition);
                 break;
-            case AdapterType.CHILDREN:
-                final int groupChildrenPosition = getGroupChildrenPosition(groupPosition, position);
-                if (onMultiClickListener != null || onChildrenClickListener != null) {
+            case AdapterType.ITEM:
+                final int groupItemPosition = getGroupItemPosition(groupPosition, position);
+                if (onMultiClickListener != null || onItemClickListener != null) {
                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             if (onMultiClickListener != null) {
-                                onMultiClickListener.onChildrenClick((BaseRecyclerViewAdapter.this),
-                                        (BaseViewHolder) holder, groupPosition, groupChildrenPosition);
+                                onMultiClickListener.onItemClick((BaseRecyclerViewAdapter.this),
+                                        (BaseViewHolder) holder, groupPosition, groupItemPosition);
                             }
-                            if (onChildrenClickListener != null) {
-                                onChildrenClickListener.onChildrenClick((BaseRecyclerViewAdapter.this),
-                                        (BaseViewHolder) holder, groupPosition, groupChildrenPosition);
+                            if (onItemClickListener != null) {
+                                onItemClickListener.onItemClick((BaseRecyclerViewAdapter.this),
+                                        (BaseViewHolder) holder, groupPosition, groupItemPosition);
                             }
                         }
                     });
                 }
-                onBindChildrenViewHolder((BaseViewHolder) holder, groupPosition, groupChildrenPosition);
+                onBindItemViewHolder((BaseViewHolder) holder, groupPosition, groupItemPosition);
                 break;
             case AdapterType.FOOTER:
                 if (onMultiClickListener != null || onFooterClickListener != null) {
@@ -175,7 +175,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         groupList.clear();
         int groupCount = getGroupCount();
         for (int groupPosition = 0; groupPosition < groupCount; groupPosition++) {
-            groupList.add(new Group(hasHeader(groupPosition), hasFooter(groupPosition), getChildrenCount(groupPosition)));
+            groupList.add(new Group(hasHeader(groupPosition), hasFooter(groupPosition), getItemCount(groupPosition)));
         }
         isDataChanged = false;
     }
@@ -184,10 +184,10 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         int itemType = getItemType(position);
         if (itemType == AdapterType.HEADER) {
             return getHeaderLayout(viewType);
+        } else if (itemType == AdapterType.ITEM) {
+            return getItemLayout(viewType);
         } else if (itemType == AdapterType.FOOTER) {
             return getFooterLayout(viewType);
-        } else if (itemType == AdapterType.CHILDREN) {
-            return getChildrenLayout(viewType);
         }
         return 0;
     }
@@ -204,9 +204,9 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
                     return AdapterType.HEADER;
                 }
             }
-            itemCount += group.getChildrenCount();
+            itemCount += group.getItemCount();
             if (position < itemCount) {
-                return AdapterType.CHILDREN;
+                return AdapterType.ITEM;
             }
             if (group.hasFooter()) {
                 itemCount += 1;
@@ -227,7 +227,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     private int getGroupItemCount(int groupPosition) {
         int itemCount = 0;
         if (groupPosition >= 0 && groupPosition < groupList.size()) {
-            itemCount = groupList.get(groupPosition).getItemCount();
+            itemCount = groupList.get(groupPosition).getRealItemCount();
         }
         return itemCount;
     }
@@ -282,13 +282,13 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
      * @param position      当前位置
      * @return 当前坐标在指定组的位置
      */
-    public int getGroupChildrenPosition(int groupPosition, int position) {
+    public int getGroupItemPosition(int groupPosition, int position) {
         if (groupPosition >= 0 && groupPosition < groupList.size()) {
             int itemCount = getRangeGroupItemCount(0, groupPosition + 1);
             Group group = groupList.get(groupPosition);
-            int childrenPosition = group.getChildrenCount() - (itemCount - position) + (group.hasFooter() ? 1 : 0);
-            if (childrenPosition >= 0) {
-                return childrenPosition;
+            int itemPosition = group.getItemCount() - (itemCount - position) + (group.hasFooter() ? 1 : 0);
+            if (itemPosition >= 0) {
+                return itemPosition;
             }
         }
         return -1;
@@ -298,19 +298,19 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
      * 根据组坐标和子项组内坐标获取指定组的子项坐标, 如果没有返回-1
      *
      * @param groupPosition      组坐标
-     * @param groupChildrenIndex 子项组内坐标
+     * @param groupItemIndex 子项组内坐标
      * @return 指定组的子项坐标
      */
-    public int getGroupChildrenPositionByIndex(int groupPosition, int groupChildrenIndex) {
+    public int getGroupItemPositionByIndex(int groupPosition, int groupItemIndex) {
         if (groupPosition >= 0 && groupPosition < groupList.size()) {
             Group group = groupList.get(groupPosition);
-            if (group.getChildrenCount() > groupChildrenIndex) {
+            if (group.getItemCount() > groupItemIndex) {
                 // 指定组的头布局前面item总和
                 int itemCount = 0;
                 for (int position = 0; position < groupPosition; position++) {
                     itemCount += getGroupItemCount(position);
                 }
-                return itemCount + groupChildrenIndex + (group.hasHeader() ? 1 : 0);
+                return itemCount + groupItemIndex + (group.hasHeader() ? 1 : 0);
             }
         }
         return -1;
@@ -402,11 +402,11 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
      *
      * @param groupPosition 组坐标
      */
-    public void notifyChildrenChanged(int groupPosition) {
+    public void notifyItemChange(int groupPosition) {
         if (groupPosition >= 0 && groupPosition < groupList.size()) {
-            int childrenPosition = getGroupChildrenPositionByIndex(groupPosition, 0);
-            if (childrenPosition >= 0) {
-                notifyItemRangeChanged(childrenPosition, groupList.get(groupPosition).getChildrenCount());
+            int itemPosition = getGroupItemPositionByIndex(groupPosition, 0);
+            if (itemPosition >= 0) {
+                notifyItemRangeChanged(itemPosition, groupList.get(groupPosition).getItemCount());
             }
         }
     }
@@ -415,12 +415,12 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
      * 根据组坐标和子项组内坐标刷新指定子项
      *
      * @param groupPosition      组坐标
-     * @param groupChildrenIndex 子项组内坐标
+     * @param groupItemIndex 子项组内坐标
      */
-    public void notifyChildrenChanged(int groupPosition, int groupChildrenIndex) {
-        int childrenPosition = getGroupChildrenPositionByIndex(groupPosition, groupChildrenIndex);
-        if (childrenPosition >= 0) {
-            notifyItemChanged(childrenPosition);
+    public void notifyItemChange(int groupPosition, int groupItemIndex) {
+        int itemPosition = getGroupItemPositionByIndex(groupPosition, groupItemIndex);
+        if (itemPosition >= 0) {
+            notifyItemChanged(itemPosition);
         }
     }
 
@@ -428,19 +428,19 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
      * 刷新指定组指定范围子项
      *
      * @param groupPosition      组坐标
-     * @param groupChildrenIndex 子项组内坐标
+     * @param groupItemIndex 子项组内坐标
      * @param refreshCount       刷新个数
      */
-    public void notifyChildrenChanged(int groupPosition, int groupChildrenIndex, int refreshCount) {
+    public void notifyItemChange(int groupPosition, int groupItemIndex, int refreshCount) {
         if (groupPosition < groupList.size()) {
-            int childrenPosition = getGroupChildrenPositionByIndex(groupPosition, groupChildrenIndex);
-            if (childrenPosition >= 0) {
+            int itemPosition = getGroupItemPositionByIndex(groupPosition, groupItemIndex);
+            if (itemPosition >= 0) {
                 Group group = groupList.get(groupPosition);
-                int childrenCount = group.getChildrenCount();
-                if (childrenCount >= groupChildrenIndex + refreshCount) {
-                    notifyItemRangeChanged(childrenPosition, refreshCount);
+                int itemCount = group.getItemCount();
+                if (itemCount >= groupItemIndex + refreshCount) {
+                    notifyItemRangeChanged(itemPosition, refreshCount);
                 } else {
-                    notifyItemRangeChanged(childrenPosition, (childrenCount - groupChildrenIndex));
+                    notifyItemRangeChanged(itemPosition, (itemCount - groupItemIndex));
                 }
             }
         }
@@ -525,15 +525,15 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
      * 注意: 仅刷新
      *
      * @param groupPosition      组坐标
-     * @param groupChildrenIndex 子项组内坐标
+     * @param groupItemIndex 子项组内坐标
      */
-    public void notifyChildrenRemoved(int groupPosition, int groupChildrenIndex) {
-        int childrenPosition = getGroupChildrenPositionByIndex(groupPosition, groupChildrenIndex);
-        if (childrenPosition >= 0) {
+    public void notifyItemRemove(int groupPosition, int groupItemIndex) {
+        int itemPosition = getGroupItemPositionByIndex(groupPosition, groupItemIndex);
+        if (itemPosition >= 0) {
             Group group = groupList.get(groupPosition);
-            notifyItemRemoved(childrenPosition);
-            notifyItemRangeChanged(childrenPosition, getItemCount() - childrenPosition);
-            group.setChildrenCount(group.getChildrenCount() - 1);
+            notifyItemRemoved(itemPosition);
+            notifyItemRangeChanged(itemPosition, getItemCount() - itemPosition);
+            group.setItemCount(group.getItemCount() - 1);
         }
     }
 
@@ -543,22 +543,22 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
      * 注意: 仅刷新
      *
      * @param groupPosition      组坐标
-     * @param groupChildrenIndex 子项组内坐标
+     * @param groupItemIndex 子项组内坐标
      * @param removedCount       刷新个数
      */
-    public void notifyChildrenRemoved(int groupPosition, int groupChildrenIndex, int removedCount) {
+    public void notifyItemRemove(int groupPosition, int groupItemIndex, int removedCount) {
         if (groupPosition < groupList.size()) {
-            int childrenPosition = getGroupChildrenPositionByIndex(groupPosition, groupChildrenIndex);
-            if (childrenPosition >= 0) {
+            int itemPosition = getGroupItemPositionByIndex(groupPosition, groupItemIndex);
+            if (itemPosition >= 0) {
                 Group group = groupList.get(groupPosition);
-                int childrenCount = group.getChildrenCount();
+                int itemCount = group.getItemCount();
                 int removeCount = removedCount;
-                if (childrenCount < groupChildrenIndex + removedCount) {
-                    removeCount = childrenCount - groupChildrenIndex;
+                if (itemCount < groupItemIndex + removedCount) {
+                    removeCount = itemCount - groupItemIndex;
                 }
-                notifyItemRangeRemoved(childrenPosition, removeCount);
-                notifyItemRangeChanged(childrenPosition, getItemCount() - removeCount);
-                group.setChildrenCount(childrenCount - removeCount);
+                notifyItemRangeRemoved(itemPosition, removeCount);
+                notifyItemRangeChanged(itemPosition, getItemCount() - removeCount);
+                group.setItemCount(itemCount - removeCount);
             }
         }
     }
@@ -569,15 +569,15 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
      *
      * @param groupPosition 组坐标
      */
-    public void notifyChildrenRemoved(int groupPosition) {
+    public void notifyItemRemove(int groupPosition) {
         if (groupPosition < groupList.size()) {
-            int childrenPosition = getGroupChildrenPositionByIndex(groupPosition, 0);
-            if (childrenPosition >= 0) {
+            int itemPosition = getGroupItemPositionByIndex(groupPosition, 0);
+            if (itemPosition >= 0) {
                 Group group = groupList.get(groupPosition);
-                int itemCount = group.getChildrenCount();
-                notifyItemRangeRemoved(childrenPosition, itemCount);
-                notifyItemRangeChanged(childrenPosition, getItemCount() - itemCount);
-                group.setChildrenCount(0);
+                int itemCount = group.getItemCount();
+                notifyItemRangeRemoved(itemPosition, itemCount);
+                notifyItemRangeChanged(itemPosition, getItemCount() - itemCount);
+                group.setItemCount(0);
             }
         }
     }
@@ -605,7 +605,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
      * @param groupPosition 组坐标
      */
     public void notifyGroupInserted(int groupPosition) {
-        Group group = new Group(hasHeader(groupPosition), hasFooter(groupPosition), getChildrenCount(groupPosition));
+        Group group = new Group(hasHeader(groupPosition), hasFooter(groupPosition), getItemCount(groupPosition));
         if (groupPosition < groupList.size()) {
             groupList.add(groupPosition, group);
         } else {
@@ -631,7 +631,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     public void notifyGroupInserted(int groupPosition, int groupCount) {
         ArrayList<Group> list = new ArrayList<>();
         for (int i = 0; i < groupCount; i++) {
-            Group group = new Group(hasHeader(i), hasFooter(i), getChildrenCount(i));
+            Group group = new Group(hasHeader(i), hasFooter(i), getItemCount(i));
             list.add(group);
         }
 
@@ -677,9 +677,9 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
             if (group.hasHeader()) {
                 index++;
             }
-            int itemCount = getChildrenCount(groupPosition);
+            int itemCount = getItemCount(groupPosition);
             if (itemCount > 0) {
-                group.setChildrenCount(itemCount);
+                group.setItemCount(itemCount);
                 notifyItemRangeInserted(index, itemCount);
                 notifyItemRangeChanged(index + itemCount, getItemCount() - index);
             }
@@ -691,18 +691,18 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
      * 注意: 仅刷新
      *
      * @param groupPosition      组坐标
-     * @param groupChildrenIndex 子项组内坐标
+     * @param groupItemIndex 子项组内坐标
      */
-    public void notifyChildrenInserted(int groupPosition, int groupChildrenIndex) {
+    public void notifyChildrenInserted(int groupPosition, int groupItemIndex) {
         if (groupPosition < groupList.size()) {
             Group group = groupList.get(groupPosition);
-            int index = getGroupChildrenPositionByIndex(groupPosition, groupChildrenIndex);
+            int index = getGroupItemPositionByIndex(groupPosition, groupItemIndex);
             if (index < 0) {
                 index = getRangeGroupItemCount(0, groupPosition);
                 index += group.hasHeader() ? 1 : 0;
-                index += group.getChildrenCount();
+                index += group.getItemCount();
             }
-            group.setChildrenCount(group.getChildrenCount() + 1);
+            group.setItemCount(group.getItemCount() + 1);
             notifyItemInserted(index);
             notifyItemRangeChanged(index + 1, getItemCount() - index);
         }
@@ -713,23 +713,23 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
      * 注意: 仅刷新
      *
      * @param groupPosition      组坐标
-     * @param groupChildrenIndex 子项组内坐标
+     * @param groupItemIndex 子项组内坐标
      * @param insertedCount      插入个数
      */
-    public void notifyChildrenInserted(int groupPosition, int groupChildrenIndex, int insertedCount) {
+    public void notifyChildrenInserted(int groupPosition, int groupItemIndex, int insertedCount) {
         if (groupPosition < groupList.size()) {
             int index = getRangeGroupItemCount(0, groupPosition);
             Group group = groupList.get(groupPosition);
             if (group.hasHeader()) {
                 index++;
             }
-            if (groupChildrenIndex < group.getChildrenCount()) {
-                index += groupChildrenIndex;
+            if (groupItemIndex < group.getItemCount()) {
+                index += groupItemIndex;
             } else {
-                index += group.getChildrenCount();
+                index += group.getItemCount();
             }
             if (insertedCount > 0) {
-                group.setChildrenCount(group.getChildrenCount() + insertedCount);
+                group.setItemCount(group.getItemCount() + insertedCount);
                 notifyItemRangeInserted(index, insertedCount);
                 notifyItemRangeChanged(index + insertedCount, getItemCount() - index);
             }
@@ -769,8 +769,8 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     /**
      * 设置子项点击事件
      */
-    public void setOnChildrenClickListener(OnChildrenClickListener onChildrenClickListener) {
-        this.onChildrenClickListener = onChildrenClickListener;
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     /**
@@ -784,7 +784,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
 
     public abstract int getGroupCount();
 
-    public abstract int getChildrenCount(int groupPosition);
+    public abstract int getItemCount(int groupPosition);
 
     public abstract boolean hasHeader(int groupPosition);
 
@@ -794,13 +794,13 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
 
     public abstract int getFooterLayout(int viewType);
 
-    public abstract int getChildrenLayout(int viewType);
+    public abstract int getItemLayout(int viewType);
 
     public abstract void onBindHeaderViewHolder(BaseViewHolder holder, int groupPosition);
 
     public abstract void onBindFooterViewHolder(BaseViewHolder holder, int groupPosition);
 
-    public abstract void onBindChildrenViewHolder(BaseViewHolder holder, int groupPosition, int groupChildPosition);
+    public abstract void onBindItemViewHolder(BaseViewHolder holder, int groupPosition, int groupItemPosition);
 
     class DataObserver extends RecyclerView.AdapterDataObserver {
 
