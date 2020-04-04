@@ -70,7 +70,7 @@ public class ExpandableAdapter extends BaseRecyclerViewAdapter<ExpandableGroupBe
     }
 
     @Override
-    public int getChildLayout(int viewType) {
+    public int getChildrenLayout(int viewType) {
         return R.layout.item_adapter_children;
     }
 
@@ -88,7 +88,7 @@ public class ExpandableAdapter extends BaseRecyclerViewAdapter<ExpandableGroupBe
     }
 
     @Override
-    public void onBindChildViewHolder(BaseViewHolder holder, int groupPosition, int childPosition) {
+    public void onBindChildrenViewHolder(BaseViewHolder holder, int groupPosition, int childPosition) {
         holder.setText(R.id.adapter_item_children_text,
                 expandableGroupList.get(groupPosition).getChildrenList().get(childPosition).getChild());
     }

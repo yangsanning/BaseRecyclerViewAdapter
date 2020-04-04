@@ -47,10 +47,10 @@ public class ExpandableListActivity extends AppCompatActivity {
             }
         });
 
-        expandableAdapter.setOnChildClickListener(new BaseRecyclerViewAdapter.OnChildClickListener() {
+        expandableAdapter.setOnChildrenClickListener(new BaseRecyclerViewAdapter.OnChildrenClickListener() {
             @Override
-            public void onChildClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder,
-                                     int groupPosition, int childPosition) {
+            public void onChildrenClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder,
+                                        int groupPosition, int childPosition) {
                 Toast.makeText(ExpandableListActivity.this,
                         expandableAdapter.getDatas().get(groupPosition).getChildrenList().get(childPosition).getChild(),
                         Toast.LENGTH_SHORT).show();
