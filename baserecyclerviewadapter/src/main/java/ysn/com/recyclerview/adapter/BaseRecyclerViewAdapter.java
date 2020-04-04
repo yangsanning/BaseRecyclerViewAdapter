@@ -59,22 +59,9 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         resetGroupList();
     }
 
-    /**
-     * 重置组列表
-     */
-    private void resetGroupList() {
-        groupList.clear();
-        int groupCount = getGroupCount();
-        for (int i = 0; i < groupCount; i++) {
-            groupList.add(new Group(hasHeader(i), hasFooter(i), getChildrenCount(i)));
-        }
-        isDataChanged = false;
-    }
-
     @Override
     public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewAttachedToWindow(holder);
-
         // 针对StaggeredGridLayout进行，保证组头和组尾占满一行。
         if (LayoutManagerUtils.isStaggeredGridLayout(holder.itemView.getLayoutParams())) {
             int position = holder.getLayoutPosition();
@@ -84,31 +71,12 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         }
     }
 
-    /**
-     * 根据position获取item类型
-     */
-    public int getItemType(int position) {
-        int itemCount = 0;
-        for (Group group : groupList) {
-            if (group.hasHeader()) {
-                itemCount += 1;
-                if (position < itemCount) {
-                    return AdapterType.HEADER;
-                }
-            }
-            itemCount += group.getChildrenCount();
-            if (position < itemCount) {
-                return AdapterType.CHILDREN;
-            }
-            if (group.hasFooter()) {
-                itemCount += 1;
-                if (position < itemCount) {
-                    return AdapterType.FOOTER;
-                }
-            }
+    @Override
+    public int getItemCount() {
+        if (isDataChanged) {
+            resetGroupList();
         }
-        throw new IndexOutOfBoundsException("获取类型失败, " +
-                "position: " + position + ", itemCount: " + getItemCount());
+        return getRangeGroupItemCount(0, groupList.size());
     }
 
     @NonNull
@@ -116,25 +84,11 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         if (isEnabledDataBinding) {
-            view = DataBindingUtil.inflate(LayoutInflater.from(context),
-                    getLayoutId(tempPosition, viewType), parent, (false)).getRoot();
+            view = DataBindingUtil.inflate(LayoutInflater.from(context), getLayoutId(tempPosition, viewType), parent, (false)).getRoot();
         } else {
-            view = LayoutInflater.from(context).inflate(
-                    getLayoutId(tempPosition, viewType), parent, (false));
+            view = LayoutInflater.from(context).inflate(getLayoutId(tempPosition, viewType), parent, (false));
         }
         return new BaseViewHolder(view);
-    }
-
-    private int getLayoutId(int position, int viewType) {
-        int type = getItemType(position);
-        if (type == AdapterType.HEADER) {
-            return getHeaderLayout(viewType);
-        } else if (type == AdapterType.FOOTER) {
-            return getFooterLayout(viewType);
-        } else if (type == AdapterType.CHILDREN) {
-            return getChildLayout(viewType);
-        }
-        return 0;
     }
 
     @Override
@@ -189,23 +143,80 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         }
     }
 
+    /******************************************** 私有方法 ****************************************/
+
+    /**
+     * 重置组列表
+     */
+    private void resetGroupList() {
+        groupList.clear();
+        int groupCount = getGroupCount();
+        for (int groupPosition = 0; groupPosition < groupCount; groupPosition++) {
+            groupList.add(new Group(hasHeader(groupPosition), hasFooter(groupPosition), getChildrenCount(groupPosition)));
+        }
+        isDataChanged = false;
+    }
+
+    private int getLayoutId(int position, int viewType) {
+        int itemType = getItemType(position);
+        if (itemType == AdapterType.HEADER) {
+            return getHeaderLayout(viewType);
+        } else if (itemType == AdapterType.FOOTER) {
+            return getFooterLayout(viewType);
+        } else if (itemType == AdapterType.CHILDREN) {
+            return getChildLayout(viewType);
+        }
+        return 0;
+    }
+
+    /**
+     * 根据position获取item类型
+     */
+    private int getItemType(int position) {
+        int itemCount = 0;
+        for (Group group : groupList) {
+            if (group.hasHeader()) {
+                itemCount += 1;
+                if (position < itemCount) {
+                    return AdapterType.HEADER;
+                }
+            }
+            itemCount += group.getChildrenCount();
+            if (position < itemCount) {
+                return AdapterType.CHILDREN;
+            }
+            if (group.hasFooter()) {
+                itemCount += 1;
+                if (position < itemCount) {
+                    return AdapterType.FOOTER;
+                }
+            }
+        }
+        throw new IndexOutOfBoundsException("获取类型失败, " + "position: " + position + ", itemCount: " + getItemCount());
+    }
+
+    /******************************************** 公开方法 ****************************************/
+
     /**
      * 根据坐标(position)获取该坐标所在组的坐标
      */
     public int getGroupPosition(int position) {
-        int count = 0;
+        // 当前组的最后一个position
+        int groupLastPosition = 0;
         int groupCount = groupList.size();
-        for (int i = 0; i < groupCount; i++) {
-            count += getGroupItemCount(i);
-            if (position < count) {
-                return i;
+        for (int groupPosition = 0; groupPosition < groupCount; groupPosition++) {
+            // 加上该组子项个数
+            groupLastPosition += getGroupItemCount(groupPosition);
+            // 当position小于当前组的最后一个position, 则为该组
+            if (position < groupLastPosition) {
+                return groupPosition;
             }
         }
         return -1;
     }
 
     /**
-     * 根据组坐标(groupPosition)获取该组Item数量（头加尾加子项）
+     * 根据组坐标(groupPosition)获取该组Item数量（头+尾+子项）
      */
     public int getGroupItemCount(int groupPosition) {
         int itemCount = 0;
@@ -216,7 +227,11 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     }
 
     /**
-     * 根据组坐标(groupPosition)获取该组子项坐标(groupChildPosition)
+     * 根据组坐标以及当前坐标, 获取当前坐标在该组的位置
+     *
+     * @param groupPosition 组的位置
+     * @param position      当前位置
+     * @return 当前坐标在指定组的位置
      */
     public int getGroupChildPosition(int groupPosition, int position) {
         if (groupPosition >= 0 && groupPosition < groupList.size()) {
@@ -228,14 +243,6 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
             }
         }
         return -1;
-    }
-
-    @Override
-    public int getItemCount() {
-        if (isDataChanged) {
-            resetGroupList();
-        }
-        return getRangeGroupItemCount(0, groupList.size());
     }
 
     /**
@@ -298,14 +305,17 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     }
 
     /**
-     * 根据组坐标(groupPosition)获取该组头下标, 如果该组没有组头返回-1
+     * 根据组坐标获取该组头布局坐标, 如果该组没有头布局则返回-1
+     * @param groupPosition 组坐标
+     * @return 指定组坐标的头布局坐标
      */
     public int getGroupHeaderPosition(int groupPosition) {
         if (groupPosition >= 0 && groupPosition < groupList.size()) {
-            if (!groupList.get(groupPosition).hasHeader()) {
+            if (groupList.get(groupPosition).hasHeader()) {
+                return getRangeGroupItemCount(0, groupPosition);
+            }else {
                 return -1;
             }
-            return getRangeGroupItemCount(0, groupPosition);
         }
         return -1;
     }
@@ -724,8 +734,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
 
     public abstract void onBindFooterViewHolder(BaseViewHolder holder, int groupPosition);
 
-    public abstract void onBindChildViewHolder(BaseViewHolder holder,
-                                               int groupPosition, int groupChildPosition);
+    public abstract void onBindChildViewHolder(BaseViewHolder holder, int groupPosition, int groupChildPosition);
 
     class DataObserver extends RecyclerView.AdapterDataObserver {
 

@@ -32,14 +32,14 @@ public class StickyListActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.sticky_list_activity_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        groupedListAdapter = new GroupedListAdapter(this, DataUtils.getGroupList(8, 3));
+        groupedListAdapter = new GroupedListAdapter(this, DataUtils.getGroupList(2, 3));
 
         groupedListAdapter.setOnHeaderClickListener(new BaseRecyclerViewAdapter.OnHeaderClickListener() {
             @Override
             public void onHeaderClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder,
                                       int groupPosition) {
                 Toast.makeText(StickyListActivity.this,
-                        groupedListAdapter.getDatas().get(groupPosition).getHeader(),
+                        groupedListAdapter.getRangeGroupItemCount(groupPosition,groupPosition+1)+"",
                         Toast.LENGTH_SHORT).show();
             }
         });

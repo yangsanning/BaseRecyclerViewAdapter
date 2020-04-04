@@ -26,6 +26,9 @@ public class DataUtils {
         for (int i = 0; i < groupCount; i++) {
             ArrayList<ChildrenBean> children = new ArrayList<>();
             for (int j = 0; j < childrenCount; j++) {
+                if (i == 1 && j == 2) {
+                    break;
+                }
                 children.add(new ChildrenBean((i + 1) + "组 - " + "子项" + (j + 1)));
             }
             groupList.add(new GroupBean(((i + 1) + "组 - 头部"), ((i + 1) + "组 - 尾部"), children));
