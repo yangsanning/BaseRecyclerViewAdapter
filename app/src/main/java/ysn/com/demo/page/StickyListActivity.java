@@ -12,9 +12,7 @@ import ysn.com.demo.adapter.GroupedListAdapter;
 import ysn.com.demo.utils.DataUtils;
 import ysn.com.recyclerview.adapter.BaseRecyclerViewAdapter;
 import ysn.com.recyclerview.holder.BaseViewHolder;
-import ysn.com.recyclerview.listener.OnChildrenClickListener;
-import ysn.com.recyclerview.listener.OnFooterClickListener;
-import ysn.com.recyclerview.listener.OnHeaderClickListener;
+import ysn.com.recyclerview.listener.OnMultiClickListener;
 
 /**
  * @Author yangsanning
@@ -36,29 +34,22 @@ public class StickyListActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.sticky_list_activity_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         groupedListAdapter = new GroupedListAdapter(this, DataUtils.getGroupList(8, 3));
-
-        groupedListAdapter.setOnHeaderClickListener(new OnHeaderClickListener() {
+        groupedListAdapter.setOnMultiClickListener(new OnMultiClickListener() {
             @Override
             public void onHeaderClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition) {
                 showMsg(groupedListAdapter.getDatas().get(groupPosition).getHeader());
             }
-        });
 
-        groupedListAdapter.setOnChildrenClickListener(new OnChildrenClickListener() {
             @Override
-            public void onChildrenClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder,
-                                        int groupPosition, int childPosition) {
+            public void onChildrenClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition, int childPosition) {
                 showMsg(groupedListAdapter.getDatas().get(groupPosition).getChildrenList().get(childPosition).getChild());
             }
-        });
 
-        groupedListAdapter.setOnFooterClickListener(new OnFooterClickListener() {
             @Override
             public void onFooterClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition) {
                 showMsg(groupedListAdapter.getDatas().get(groupPosition).getFooter());
             }
         });
-
         recyclerView.setAdapter(groupedListAdapter);
     }
 

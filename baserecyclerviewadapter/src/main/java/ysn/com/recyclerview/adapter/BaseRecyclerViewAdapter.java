@@ -16,6 +16,7 @@ import ysn.com.recyclerview.holder.BaseViewHolder;
 import ysn.com.recyclerview.listener.OnChildrenClickListener;
 import ysn.com.recyclerview.listener.OnFooterClickListener;
 import ysn.com.recyclerview.listener.OnHeaderClickListener;
+import ysn.com.recyclerview.listener.OnMultiClickListener;
 import ysn.com.recyclerview.mode.annotation.AdapterType;
 import ysn.com.recyclerview.mode.bean.Group;
 import ysn.com.recyclerview.utils.LayoutManagerUtils;
@@ -42,9 +43,10 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     private boolean isDataChanged;
     private int tempPosition;
 
+    private OnMultiClickListener onMultiClickListener;
     private OnHeaderClickListener onHeaderClickListener;
-    private OnFooterClickListener onFooterClickListener;
     private OnChildrenClickListener onChildrenClickListener;
+    private OnFooterClickListener onFooterClickListener;
 
     public BaseRecyclerViewAdapter(Context context) {
         this(context, (false));
@@ -105,10 +107,14 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         final int groupPosition = getGroupPosition(position);
         switch (getItemType(position)) {
             case AdapterType.HEADER:
-                if (onHeaderClickListener != null) {
+                if (onMultiClickListener != null || onHeaderClickListener != null) {
                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            if (onMultiClickListener != null) {
+                                onMultiClickListener.onHeaderClick((BaseRecyclerViewAdapter.this),
+                                        (BaseViewHolder) holder, groupPosition);
+                            }
                             if (onHeaderClickListener != null) {
                                 onHeaderClickListener.onHeaderClick((BaseRecyclerViewAdapter.this),
                                         (BaseViewHolder) holder, groupPosition);
@@ -118,26 +124,16 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
                 }
                 onBindHeaderViewHolder((BaseViewHolder) holder, groupPosition);
                 break;
-            case AdapterType.FOOTER:
-                if (onFooterClickListener != null) {
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (onFooterClickListener != null) {
-                                onFooterClickListener.onFooterClick((BaseRecyclerViewAdapter.this),
-                                        (BaseViewHolder) holder, groupPosition);
-                            }
-                        }
-                    });
-                }
-                onBindFooterViewHolder((BaseViewHolder) holder, groupPosition);
-                break;
             case AdapterType.CHILDREN:
                 final int groupChildrenPosition = getGroupChildrenPosition(groupPosition, position);
-                if (onChildrenClickListener != null) {
+                if (onMultiClickListener != null || onChildrenClickListener != null) {
                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            if (onMultiClickListener != null) {
+                                onMultiClickListener.onChildrenClick((BaseRecyclerViewAdapter.this),
+                                        (BaseViewHolder) holder, groupPosition, groupChildrenPosition);
+                            }
                             if (onChildrenClickListener != null) {
                                 onChildrenClickListener.onChildrenClick((BaseRecyclerViewAdapter.this),
                                         (BaseViewHolder) holder, groupPosition, groupChildrenPosition);
@@ -146,6 +142,24 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
                     });
                 }
                 onBindChildrenViewHolder((BaseViewHolder) holder, groupPosition, groupChildrenPosition);
+                break;
+            case AdapterType.FOOTER:
+                if (onMultiClickListener != null || onFooterClickListener != null) {
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (onMultiClickListener != null) {
+                                onMultiClickListener.onFooterClick((BaseRecyclerViewAdapter.this),
+                                        (BaseViewHolder) holder, groupPosition);
+                            }
+                            if (onFooterClickListener != null) {
+                                onFooterClickListener.onFooterClick((BaseRecyclerViewAdapter.this),
+                                        (BaseViewHolder) holder, groupPosition);
+                            }
+                        }
+                    });
+                }
+                onBindFooterViewHolder((BaseViewHolder) holder, groupPosition);
                 break;
             default:
                 break;
@@ -739,6 +753,13 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     }
 
     /**
+     * 所有点击事件的汇总
+     */
+    public void setOnMultiClickListener(OnMultiClickListener onMultiClickListener) {
+        this.onMultiClickListener = onMultiClickListener;
+    }
+
+    /**
      * 设置组头点击事件
      */
     public void setOnHeaderClickListener(OnHeaderClickListener onHeaderClickListener) {
@@ -746,17 +767,17 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     }
 
     /**
-     * 设置组尾点击事件
-     */
-    public void setOnFooterClickListener(OnFooterClickListener onFooterClickListener) {
-        this.onFooterClickListener = onFooterClickListener;
-    }
-
-    /**
      * 设置子项点击事件
      */
     public void setOnChildrenClickListener(OnChildrenClickListener onChildrenClickListener) {
         this.onChildrenClickListener = onChildrenClickListener;
+    }
+
+    /**
+     * 设置组尾点击事件
+     */
+    public void setOnFooterClickListener(OnFooterClickListener onFooterClickListener) {
+        this.onFooterClickListener = onFooterClickListener;
     }
 
     public abstract List<T> getDatas();
