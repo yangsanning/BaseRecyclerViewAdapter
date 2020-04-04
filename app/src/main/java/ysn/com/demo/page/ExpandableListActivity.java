@@ -7,11 +7,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
-import ysn.com.recyclerview.adapter.BaseRecyclerViewAdapter;
-import ysn.com.recyclerview.holder.BaseViewHolder;
 import ysn.com.demo.R;
 import ysn.com.demo.adapter.ExpandableAdapter;
 import ysn.com.demo.utils.DataUtils;
+import ysn.com.recyclerview.adapter.BaseRecyclerViewAdapter;
+import ysn.com.recyclerview.holder.BaseViewHolder;
+import ysn.com.recyclerview.listener.OnChildrenClickListener;
+import ysn.com.recyclerview.listener.OnFooterClickListener;
+import ysn.com.recyclerview.listener.OnHeaderClickListener;
 
 /**
  * @Author yangsanning
@@ -35,7 +38,7 @@ public class ExpandableListActivity extends AppCompatActivity {
         expandableAdapter = new ExpandableAdapter(this,
                 DataUtils.getExpandableGroupList(8, 3));
 
-        expandableAdapter.setOnHeaderClickListener(new BaseRecyclerViewAdapter.OnHeaderClickListener() {
+        expandableAdapter.setOnHeaderClickListener(new OnHeaderClickListener() {
             @Override
             public void onHeaderClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition) {
                 ExpandableAdapter expandableAdapter = (ExpandableAdapter) adapter;
@@ -47,7 +50,7 @@ public class ExpandableListActivity extends AppCompatActivity {
             }
         });
 
-        expandableAdapter.setOnChildrenClickListener(new BaseRecyclerViewAdapter.OnChildrenClickListener() {
+        expandableAdapter.setOnChildrenClickListener(new OnChildrenClickListener() {
             @Override
             public void onChildrenClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder,
                                         int groupPosition, int childPosition) {
@@ -57,7 +60,7 @@ public class ExpandableListActivity extends AppCompatActivity {
             }
         });
 
-        expandableAdapter.setOnFooterClickListener(new BaseRecyclerViewAdapter.OnFooterClickListener() {
+        expandableAdapter.setOnFooterClickListener(new OnFooterClickListener() {
             @Override
             public void onFooterClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition) {
                 Toast.makeText(ExpandableListActivity.this,

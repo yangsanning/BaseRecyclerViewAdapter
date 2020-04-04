@@ -12,6 +12,9 @@ import ysn.com.demo.adapter.GroupedListAdapter;
 import ysn.com.demo.utils.DataUtils;
 import ysn.com.recyclerview.adapter.BaseRecyclerViewAdapter;
 import ysn.com.recyclerview.holder.BaseViewHolder;
+import ysn.com.recyclerview.listener.OnChildrenClickListener;
+import ysn.com.recyclerview.listener.OnFooterClickListener;
+import ysn.com.recyclerview.listener.OnHeaderClickListener;
 
 /**
  * @Author yangsanning
@@ -34,14 +37,14 @@ public class StickyListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         groupedListAdapter = new GroupedListAdapter(this, DataUtils.getGroupList(8, 3));
 
-        groupedListAdapter.setOnHeaderClickListener(new BaseRecyclerViewAdapter.OnHeaderClickListener() {
+        groupedListAdapter.setOnHeaderClickListener(new OnHeaderClickListener() {
             @Override
             public void onHeaderClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition) {
                 showMsg(groupedListAdapter.getDatas().get(groupPosition).getHeader());
             }
         });
 
-        groupedListAdapter.setOnChildrenClickListener(new BaseRecyclerViewAdapter.OnChildrenClickListener() {
+        groupedListAdapter.setOnChildrenClickListener(new OnChildrenClickListener() {
             @Override
             public void onChildrenClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder,
                                         int groupPosition, int childPosition) {
@@ -49,7 +52,7 @@ public class StickyListActivity extends AppCompatActivity {
             }
         });
 
-        groupedListAdapter.setOnFooterClickListener(new BaseRecyclerViewAdapter.OnFooterClickListener() {
+        groupedListAdapter.setOnFooterClickListener(new OnFooterClickListener() {
             @Override
             public void onFooterClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition) {
                 showMsg(groupedListAdapter.getDatas().get(groupPosition).getFooter());

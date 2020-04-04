@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ysn.com.recyclerview.holder.BaseViewHolder;
+import ysn.com.recyclerview.listener.OnChildrenClickListener;
+import ysn.com.recyclerview.listener.OnFooterClickListener;
+import ysn.com.recyclerview.listener.OnHeaderClickListener;
 import ysn.com.recyclerview.mode.annotation.AdapterType;
 import ysn.com.recyclerview.mode.bean.Group;
 import ysn.com.recyclerview.utils.LayoutManagerUtils;
@@ -743,13 +746,6 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     }
 
     /**
-     * 组头点击事件
-     */
-    public interface OnHeaderClickListener {
-        void onHeaderClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition);
-    }
-
-    /**
      * 设置组尾点击事件
      */
     public void setOnFooterClickListener(OnFooterClickListener onFooterClickListener) {
@@ -757,25 +753,10 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     }
 
     /**
-     * 组尾点击事件
-     */
-    public interface OnFooterClickListener {
-        void onFooterClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition);
-    }
-
-
-    /**
      * 设置子项点击事件
      */
     public void setOnChildrenClickListener(OnChildrenClickListener onChildrenClickListener) {
         this.onChildrenClickListener = onChildrenClickListener;
-    }
-
-    /**
-     * 子项点击事件
-     */
-    public interface OnChildrenClickListener {
-        void onChildrenClick(BaseRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition, int childPosition);
     }
 
     public abstract List<T> getDatas();
