@@ -5,8 +5,8 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
-import ysn.com.baserecyclerviewadapter.adapter.BaseRecyclerViewAdapter;
-import ysn.com.baserecyclerviewadapter.holder.BaseViewHolder;
+import ysn.com.recyclerview.adapter.BaseRecyclerViewAdapter;
+import ysn.com.recyclerview.holder.BaseViewHolder;
 import ysn.com.demo.R;
 import ysn.com.demo.bean.ChildrenBean;
 import ysn.com.demo.bean.GroupBean;

@@ -1,4 +1,4 @@
-package ysn.com.baserecyclerviewadapter.adapter;
+package ysn.com.recyclerview.adapter;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
@@ -12,10 +12,10 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import ysn.com.baserecyclerviewadapter.holder.BaseViewHolder;
-import ysn.com.baserecyclerviewadapter.mode.annotation.AdapterType;
-import ysn.com.baserecyclerviewadapter.mode.bean.Group;
-import ysn.com.baserecyclerviewadapter.utils.LayoutManagerUtils;
+import ysn.com.recyclerview.holder.BaseViewHolder;
+import ysn.com.recyclerview.mode.annotation.AdapterType;
+import ysn.com.recyclerview.mode.bean.Group;
+import ysn.com.recyclerview.utils.LayoutManagerUtils;
 
 /**
  * @Author yangsanning

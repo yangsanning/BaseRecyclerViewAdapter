@@ -7,8 +7,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
-import ysn.com.baserecyclerviewadapter.adapter.BaseRecyclerViewAdapter;
-import ysn.com.baserecyclerviewadapter.holder.BaseViewHolder;
+import ysn.com.recyclerview.adapter.BaseRecyclerViewAdapter;
+import ysn.com.recyclerview.holder.BaseViewHolder;
 import ysn.com.demo.R;
 import ysn.com.demo.adapter.ExpandableAdapter;
 import ysn.com.demo.utils.DataUtils;

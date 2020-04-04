@@ -1,4 +1,4 @@
-package ysn.com.baserecyclerviewadapter.view;
+package ysn.com.recyclerview.view;
 
 import android.content.Context;
 import android.support.annotation.AttrRes;
@@ -13,9 +13,9 @@ import android.widget.FrameLayout;
 
 import java.lang.reflect.Method;
 
-import ysn.com.baserecyclerviewadapter.adapter.BaseRecyclerViewAdapter;
-import ysn.com.baserecyclerviewadapter.holder.BaseViewHolder;
-import ysn.com.baserecyclerviewadapter.utils.LayoutManagerUtils;
+import ysn.com.recyclerview.adapter.BaseRecyclerViewAdapter;
+import ysn.com.recyclerview.holder.BaseViewHolder;
+import ysn.com.recyclerview.utils.LayoutManagerUtils;
 
 /**
  * @Author yangsanning

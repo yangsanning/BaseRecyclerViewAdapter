@@ -1,4 +1,4 @@
-package ysn.com.baserecyclerviewadapter.mode.annotation;
+package ysn.com.recyclerview.mode.annotation;
 
 import android.support.annotation.IntDef;
 

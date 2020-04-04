@@ -1,4 +1,4 @@
-package ysn.com.baserecyclerviewadapter.holder;
+package ysn.com.recyclerview.holder;
 
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;

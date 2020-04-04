@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ysn.com.baserecyclerviewadapter.view.StickyHeaderLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ysn.com.recyclerview.view.StickyHeaderLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,4 +8,4 @@
         android:id="@+id/sticky_list_activity_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-</ysn.com.baserecyclerviewadapter.view.StickyHeaderLayout>
+</ysn.com.recyclerview.view.StickyHeaderLayout>

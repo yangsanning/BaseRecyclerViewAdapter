@@ -1,4 +1,4 @@
-package ysn.com.baserecyclerviewadapter.mode.bean;
+package ysn.com.recyclerview.mode.bean;
 
 /**
  * @Author yangsanning
